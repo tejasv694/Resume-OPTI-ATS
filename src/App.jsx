@@ -737,9 +737,17 @@ export default function ResumeOptimizer(){
 
       <div className="webhook-config" style={{maxWidth:1120,marginLeft:'auto',marginRight:'auto'}}><div className="section-label"><span className="num">3</span> n8n Webhook URL</div><div className="webhook-input-row"><input type="url" placeholder="http://localhost:5678/webhook-test/resume-optimizer" value={webhookUrl==="YOUR_N8N_WEBHOOK_URL_HERE"?"":webhookUrl} onChange={e=>setWebhookUrl(e.target.value)}/></div></div>
 
-      <button style={{maxWidth:1120,marginLeft:'auto',marginRight:'auto'}} className={`analyze-btn ${loading?"loading":isReady?"ready":"disabled"}`} onClick={analyze} disabled={!isReady||loading}>
-        {loading?(<><div className="loader"><span/><span/><span/></div> Running 6-stage ATS analysis...</>):(<><SparkleIcon size={18}/> Analyze & Optimize Resume</>)}
-      </button>
+      <div style={{maxWidth:1120,marginLeft:'auto',marginRight:'auto',display:'flex',gap:12,flexDirection:'column'}}>
+        <button className={`analyze-btn ${loading?"loading":isReady?"ready":"disabled"}`} onClick={analyze} disabled={!isReady||loading}>
+          {loading?(<><div className="loader"><span/><span/><span/></div> Running 6-stage ATS analysis...</>):(<><SparkleIcon size={18}/> Analyze & Optimize Resume</>)}
+        </button>
+        <button style={{width:'100%',padding:'11px',border:'1px dashed var(--border)',borderRadius:'var(--radius)',background:'transparent',color:'var(--text-dim)',fontSize:13,fontFamily:"'DM Sans',sans-serif",cursor:'pointer',transition:'all .2s',display:'flex',alignItems:'center',justifyContent:'center',gap:8}} onClick={()=>setResult(DEMO_RESULT)}
+          onMouseOver={e=>{e.currentTarget.style.borderColor='var(--accent)';e.currentTarget.style.color='var(--accent)'}}
+          onMouseOut={e=>{e.currentTarget.style.borderColor='var(--border)';e.currentTarget.style.color='var(--text-dim)'}}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          Load demo — preview the full results UI instantly
+        </button>
+      </div>
 
       {loading&&(<div className="pipeline">{pipelineLabels.map((s,i)=>(<div key={s} style={{display:"flex",alignItems:"center"}}><div className={`pipeline-step ${pipelineStep===i+1?"active":pipelineStep>i+1?"done":""}`}>{pipelineStep>i+1?<CheckIcon/>:(i+1)} {s}</div>{i<pipelineLabels.length-1&&<span className="pipeline-arrow">›</span>}</div>))}</div>)}
       {error&&<div className="error-banner">{error}</div>}
