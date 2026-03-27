@@ -56,10 +56,13 @@ const styles = `
   @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
 
   
-  .split-layout{display:grid;grid-template-columns:minmax(0,1fr) 440px;gap:24px;align-items:start;margin-top:28px}
-  @media(max-width:1100px){.split-layout{grid-template-columns:1fr!important}.resume-col{position:static!important}}
-  .analysis-col{min-width:0}
-  .resume-col{position:sticky;top:20px;min-width:0}
+  .split-layout{display:flex;flex-direction:row;gap:0;align-items:start;margin-top:28px;width:100%}
+  @media(max-width:1100px){.split-layout{flex-direction:column!important}.resume-col{position:static!important;width:100%!important}.drag-handle{display:none!important}}
+  .analysis-col{min-width:320px;flex:1 1 0;overflow:hidden}
+  .resume-col{position:sticky;top:20px;min-width:280px;flex:0 0 auto}
+  .drag-handle{width:8px;flex:0 0 8px;cursor:col-resize;display:flex;align-items:stretch;justify-content:center;padding:0 2px;margin:0 4px;z-index:10;user-select:none}
+  .drag-handle-bar{width:4px;border-radius:99px;background:var(--border);transition:background .15s}
+  .drag-handle:hover .drag-handle-bar,.drag-handle.dragging .drag-handle-bar{background:var(--accent)}
 
   
   .resume-preview-wrap{border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;background:var(--surface)}
@@ -222,7 +225,9 @@ function KeywordFrequencyTable({ data }) {
 const DEMO_HTML = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>@page{size:A4;margin:20mm 18mm}body{font-family:Calibri,Arial,sans-serif;color:#1a1a1a;line-height:1.45;font-size:11pt;max-width:720px;margin:0 auto;padding:30px 40px}h1{font-size:20pt;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:2px}.contact{font-size:9.5pt;color:#444;margin-bottom:14px}hr{border:none;border-top:2px solid #1a1a1a;margin:0 0 12px}.section-title{font-size:11pt;font-weight:700;text-transform:uppercase;letter-spacing:2px;border-bottom:1.5px solid #333;padding-bottom:2px;margin:14px 0 8px}.summary{font-size:10.5pt;color:#222;line-height:1.55;margin-bottom:14px}.skills-row{margin-bottom:4px;font-size:10.5pt}.skills-row strong{color:#000}.job{margin-bottom:12px}.job-line1{display:flex;justify-content:space-between;margin-bottom:1px}.job-title{font-weight:700;font-size:11pt}.job-dates{font-size:9.5pt;color:#444}.job-company{font-size:10.5pt;color:#333;margin-bottom:3px}ul{padding-left:16px;margin:0}li{font-size:10.5pt;margin-bottom:2px;line-height:1.5}.edu-line1{display:flex;justify-content:space-between}.edu-degree{font-weight:700;font-size:10.5pt}.edu-dates{font-size:9.5pt;color:#444}.edu-school{font-size:10.5pt;color:#333}@media print{body{padding:0}}</style></head><body><h1>John Doe</h1><div class="contact">john.doe@email.com | (555) 123-4567 | San Francisco, CA | linkedin.com/in/johndoe</div><hr><div class="summary">Senior Frontend Engineer with 5+ years building high-performance React and TypeScript applications at scale. Experienced in architecting serverless microservices on AWS, implementing CI/CD pipelines with GitHub Actions, and mentoring cross-functional teams. Passionate about delivering exceptional user experiences through clean, type-safe code and modern frontend practices.</div><div class="section-title">Technical Skills</div><div class="skills-row"><strong>Languages:</strong> TypeScript, JavaScript (ES6+), HTML5, CSS3, Sass</div><div class="skills-row"><strong>Frameworks:</strong> React, Next.js, Node.js, Express, GraphQL</div><div class="skills-row"><strong>Tools & Cloud:</strong> Docker, AWS (Lambda, S3, CloudFront), GitHub Actions, Jest, Cypress</div><div class="section-title">Professional Experience</div><div class="job"><div class="job-line1"><span class="job-title">Senior Frontend Developer</span><span class="job-dates">Jan 2021 - Present</span></div><div class="job-company">TechCorp Inc., San Francisco, CA</div><ul><li>Architected and delivered 5+ production-grade React/TypeScript SPAs serving 50K+ daily active users, reducing page load times by 40% through code splitting and lazy loading</li><li>Implemented end-to-end CI/CD pipelines using GitHub Actions, achieving 99.9% deployment success rate and reducing release cycles from 2 weeks to daily</li><li>Containerized frontend development environment using Docker, streamlining onboarding from 2 hours to 15 minutes for new team members</li><li>Collaborated cross-functionally with product, design, and backend teams to deliver 20+ features aligned with business objectives</li></ul></div><div class="job"><div class="job-line1"><span class="job-title">Frontend Developer</span><span class="job-dates">Jun 2018 - Dec 2020</span></div><div class="job-company">StartupXYZ, Remote</div><ul><li>Developed responsive web applications using React and JavaScript, serving 15K+ monthly users across desktop and mobile platforms</li><li>Optimized application performance through implementing GraphQL APIs, reducing data overfetching by 60% and improving Core Web Vitals</li><li>Built comprehensive unit and integration test suites using Jest and Cypress, achieving 85% code coverage</li></ul></div><div class="section-title">Education</div><div class="edu-line1"><span class="edu-degree">B.S. Computer Science</span><span class="edu-dates">2018</span></div><div class="edu-school">State University</div><div class="section-title">Certifications</div><div style="font-size:10.5pt">AWS Certified Developer Associate | Google Analytics Certified</div></body></html>`;
 
 const DEMO_RESULT = {
-  score:68,matched_keywords:["React","JavaScript","Git","REST APIs","Agile","CSS","HTML"],missing_keywords:["TypeScript","GraphQL","CI/CD","Docker","AWS","Next.js","Jest"],
+  score:68,original_score:68,optimized_score:84,score_improvement:16,
+  original_resume_html:`<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{font-family:Arial,sans-serif;font-size:10.5pt;line-height:1.6;color:#1a1a1a;max-width:740px;margin:0 auto;padding:28px 36px}</style></head><body><h2>John Doe</h2><p>john.doe@email.com | (555) 123-4567 | San Francisco, CA</p><hr/><p><strong>Summary:</strong> Senior Frontend Engineer with 5+ years building high-performance React and JavaScript applications. Experienced working with teams on deployment and feature delivery.</p><p><strong>Skills:</strong> React, JavaScript, HTML, CSS, Git, REST APIs, Agile, Node.js</p><p><strong>Experience:</strong></p><p><strong>Senior Frontend Developer</strong> — TechCorp Inc. (Jan 2021–Present)</p><ul><li>Built web applications using React</li><li>Worked with team to deploy features</li><li>Analyzed sales data to create reports</li></ul><p><strong>Frontend Developer</strong> — StartupXYZ (Jun 2018–Dec 2020)</p><ul><li>Developed responsive web applications using React and JavaScript</li><li>Optimized application performance</li></ul><p><strong>Education:</strong> B.S. Computer Science, State University 2018</p></body></html>`,
+  matched_keywords:["React","JavaScript","Git","REST APIs","Agile","CSS","HTML"],missing_keywords:["TypeScript","GraphQL","CI/CD","Docker","AWS","Next.js","Jest"],
   suggestions:["Add TypeScript prominently","Include CI/CD experience","Mention containerization","Add cloud experience","Quantify achievements"],
   score_breakdown:{keyword_match:58,skills_alignment:65,experience_relevance:75,formatting:90},
   jd_analysis:{hard_skills:[{skill:"TypeScript",frequency_score:6},{skill:"React",frequency_score:5},{skill:"Node.js",frequency_score:4}],soft_skills:["Collaboration","Communication","Problem-solving"],certifications:["AWS Certified Developer"],tools_tech:["React","TypeScript","Node.js","GraphQL","Docker","Jest","GitHub Actions"],industry_terms:["microservices","serverless","SPA","SSR"],action_verbs:["Architect","Implement","Optimize","Collaborate","Deliver"]},
@@ -345,9 +350,10 @@ function Accordion({title,icon,color,children,defaultOpen=false}){const[open,set
 function ScoreRing({score,color}){const r=30,c=2*Math.PI*r,offset=c-(score/100)*c;return(<div className="score-ring"><svg width="72" height="72" viewBox="0 0 72 72"><circle className="bg" cx="36" cy="36" r={r} fill="none" strokeWidth="6"/><circle className="fg" cx="36" cy="36" r={r} fill="none" strokeWidth="6" stroke={color} strokeDasharray={c} strokeDashoffset={offset} strokeLinecap="round"/></svg><div className="score-text" style={{color}}>{score}</div></div>)}
 
 // ── Resume Preview with Keyword Highlights (side panel) ─────────────────
-function ResumePreview({ html, matchedKeywords, missingKeywords, downloadAsDocx, saveAsPdf, downloadHtml }) {
+function ResumePreview({ html, originalHtml, matchedKeywords, missingKeywords, downloadAsDocx, saveAsPdf, downloadHtml }) {
   const [highlights, setHighlights] = useState(true);
   const [activeKw, setActiveKw]     = useState(null);
+  const [showOriginal, setShowOriginal] = useState(false);
   const iframeRef = useRef(null);
 
   const buildHighlightedHtml = (rawHtml, matched, missing, active, on) => {
@@ -412,8 +418,9 @@ function ResumePreview({ html, matchedKeywords, missingKeywords, downloadAsDocx,
   };
 
   useEffect(()=>{
-    writeIframe(buildHighlightedHtml(html, matchedKeywords, missingKeywords, activeKw, highlights));
-  }, [highlights, activeKw, html]); // eslint-disable-line
+    const activeHtml = showOriginal && originalHtml ? originalHtml : html;
+    writeIframe(buildHighlightedHtml(activeHtml, matchedKeywords, missingKeywords, activeKw, showOriginal ? false : highlights));
+  }, [highlights, activeKw, html, showOriginal, originalHtml]); // eslint-disable-line
 
   const total = (matchedKeywords||[]).length + (missingKeywords||[]).length;
 
@@ -422,13 +429,27 @@ function ResumePreview({ html, matchedKeywords, missingKeywords, downloadAsDocx,
       <div className="resume-preview-bar">
         <div className="resume-preview-title">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-          Resume Preview
-          {highlights&&<span className="kw-count-badge">{total} keywords</span>}
+          {showOriginal ? 'Original Resume' : 'Optimized Resume'}
+          {!showOriginal && highlights&&<span className="kw-count-badge">{total} keywords</span>}
+          {showOriginal && <span style={{fontSize:9,fontFamily:"'Space Mono',monospace",padding:'1px 7px',borderRadius:99,background:'rgba(230,126,34,0.1)',color:'#e67e22',border:'1px solid rgba(230,126,34,0.25)',marginLeft:4}}>ORIGINAL</span>}
         </div>
-        <button className={`highlight-toggle ${highlights?'on':''}`} onClick={()=>{setHighlights(h=>!h);setActiveKw(null);}}>
-          <span className="toggle-dot"/>
-          {highlights?'Highlights ON':'Highlights OFF'}
-        </button>
+        <div style={{display:'flex',gap:6,alignItems:'center'}}>
+          {originalHtml && (
+            <button
+              className={`highlight-toggle ${showOriginal?'on':''}`}
+              onClick={()=>setShowOriginal(s=>!s)}
+              style={{borderColor: showOriginal ? 'rgba(230,126,34,0.5)' : undefined, color: showOriginal ? '#e67e22' : undefined, background: showOriginal ? 'rgba(230,126,34,0.06)' : undefined}}
+              title={showOriginal ? 'Switch to optimized resume' : 'View your original uploaded resume'}
+            >
+              <span style={{fontSize:11}}>{showOriginal ? '✦' : '◎'}</span>
+              {showOriginal ? 'Optimized' : 'Original'}
+            </button>
+          )}
+          <button className={`highlight-toggle ${highlights&&!showOriginal?'on':''}`} onClick={()=>{setHighlights(h=>!h);setActiveKw(null);}} disabled={showOriginal} style={{opacity:showOriginal?0.4:1}}>
+            <span className="toggle-dot"/>
+            {highlights&&!showOriginal?'Highlights ON':'Highlights OFF'}
+          </button>
+        </div>
       </div>
 
       {highlights&&(
@@ -668,8 +689,98 @@ function SuggestedBulletsSection({ injectionReport }) {
   );
 }
 
+
+function DragHandle({ onDrag }) {
+  const [active, setActive] = useState(false);
+
+  const onMouseDown = (e) => {
+    e.preventDefault();
+    setActive(true);
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
+    const onMove = (ev) => { onDrag(ev.clientX); };
+    const onUp = () => {
+      setActive(false);
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+      window.removeEventListener('mousemove', onMove);
+      window.removeEventListener('mouseup', onUp);
+    };
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('mouseup', onUp);
+  };
+
+  return (
+    <div
+      className={"drag-handle" + (active ? " dragging" : "")}
+      onMouseDown={onMouseDown}
+      title="Drag to resize columns"
+      style={{display:'flex',alignItems:'center',justifyContent:'center',width:16,flexShrink:0,cursor:'col-resize',padding:'0 4px',alignSelf:'stretch'}}
+    >
+      <div style={{width:4,height:'100%',minHeight:200,borderRadius:99,background:active?'var(--accent)':'var(--border)',transition:'background .15s'}}/>
+    </div>
+  );
+}
+
 export default function ResumeOptimizer(){
-  const[file,setFile]=useState(null);const[jobDesc,setJobDesc]=useState("");const[webhookUrl,setWebhookUrl]=useState(N8N_WEBHOOK_URL);const[loading,setLoading]=useState(false);const[result,setResult]=useState(null);const[error,setError]=useState(null);const[dragging,setDragging]=useState(false);const[pipelineStep,setPipelineStep]=useState(0);const fileInputRef=useRef(null);const isReady=file&&jobDesc.trim().length>20;
+  const[file,setFile]=useState(null);const[jobDesc,setJobDesc]=useState("");const[resumeWidth,setResumeWidth]=useState(440);const splitRef=useRef(null);const[webhookUrl,setWebhookUrl]=useState(N8N_WEBHOOK_URL);const[loading,setLoading]=useState(false);const[result,setResult]=useState(null);const[error,setError]=useState(null);const[dragging,setDragging]=useState(false);const[pipelineStep,setPipelineStep]=useState(0);const fileInputRef=useRef(null);const isReady=file&&jobDesc.trim().length>20;
+  const [translateOn, setTranslateOn] = useState(false);
+
+  const handleTranslate = () => {
+    if (translateOn) {
+      // Remove Google Translate — restore original language
+      const frame = document.querySelector('.goog-te-banner-frame');
+      if (frame) frame.remove();
+      const bar = document.querySelector('.skiptranslate');
+      if (bar) bar.style.display = 'none';
+      document.body.style.top = '0px';
+      // Reset the select to original language
+      const sel = document.querySelector('.goog-te-combo');
+      if (sel) { sel.value = ''; sel.dispatchEvent(new Event('change')); }
+      setTranslateOn(false);
+    } else {
+      // Inject Google Translate widget if not already there
+      if (!document.getElementById('gt-script')) {
+        window.googleTranslateElementInit = function () {
+          new window.google.translate.TranslateElement(
+            { pageLanguage: 'de', includedLanguages: 'en', autoDisplay: false, layout: 0 },
+            'google_translate_element'
+          );
+        };
+        const s = document.createElement('script');
+        s.id = 'gt-script';
+        s.src = '//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
+        document.body.appendChild(s);
+        // Wait for widget then auto-select English
+        const trySelect = (attempts = 0) => {
+          const sel = document.querySelector('.goog-te-combo');
+          if (sel) {
+            sel.value = 'en';
+            sel.dispatchEvent(new Event('change'));
+          } else if (attempts < 20) {
+            setTimeout(() => trySelect(attempts + 1), 300);
+          }
+        };
+        setTimeout(() => trySelect(), 800);
+      } else {
+        // Script already loaded — just re-select English
+        const sel = document.querySelector('.goog-te-combo');
+        if (sel) { sel.value = 'en'; sel.dispatchEvent(new Event('change')); }
+      }
+      setTranslateOn(true);
+    }
+  };
+
+  const handleResize = useCallback((clientX) => {
+    if (!splitRef.current) return;
+    const rect = splitRef.current.getBoundingClientRect();
+    const totalW = rect.width;
+    const handleW = 16;
+    const analysisW = clientX - rect.left;
+    const newResumeW = totalW - analysisW - handleW;
+    const clamped = Math.max(280, Math.min(totalW - 320 - handleW, newResumeW));
+    setResumeWidth(Math.round(clamped));
+  }, []);
 
   const handleDrop=useCallback((e)=>{e.preventDefault();setDragging(false);const f=e.dataTransfer.files[0];if(f&&(f.type==="application/pdf"||f.name.match(/\.docx?$/i))){setFile(f);setError(null)}else setError("Please upload a PDF or Word document.")},[]);
 
@@ -752,12 +863,54 @@ export default function ResumeOptimizer(){
       {error&&<div className="error-banner">{error}</div>}
 
       {r&&(<div className="results">
+        {/* Hidden Google Translate widget anchor */}
+        <div id="google_translate_element" style={{display:'none'}}/>
+
         <div className="results-header">
-          <h2>ATS Analysis Report</h2>
-          <div className="score-ring-wrap"><ScoreRing score={r.score} color={scoreColor(r.score)}/><div><div style={{fontFamily:"'Space Mono',monospace",fontSize:12,color:"var(--text-dim)",letterSpacing:1,textTransform:"uppercase"}}>ATS Score</div><div style={{fontSize:13,color:"var(--text-dim)",marginTop:2}}>{r.score>=80?"Strong match":r.score>=50?"Needs improvement":"Significant gaps"}</div></div></div>
+          <div style={{display:'flex',alignItems:'center',gap:12,flexWrap:'wrap'}}>
+            <h2 style={{margin:0}}>ATS Analysis Report</h2>
+            <button
+              onClick={handleTranslate}
+              style={{
+                display:'inline-flex',alignItems:'center',gap:7,
+                padding:'7px 14px',borderRadius:99,border:'1px solid var(--border)',
+                background: translateOn ? 'rgba(0,206,201,0.06)' : 'var(--surface)',
+                color: translateOn ? 'var(--green)' : 'var(--text-dim)',
+                borderColor: translateOn ? 'rgba(0,206,201,0.4)' : 'var(--border)',
+                fontFamily:"'Space Mono',monospace",fontSize:10,letterSpacing:.5,
+                cursor:'pointer',transition:'all .2s',textTransform:'uppercase'
+              }}
+              title={translateOn ? 'Click to restore German' : 'Translate entire page to English'}
+            >
+              <span style={{fontSize:13}}>{translateOn ? '🇩🇪' : '🇬🇧'}</span>
+              <span>{translateOn ? 'Showing English — click to restore' : 'Translate page to EN'}</span>
+            </button>
+          </div>
+          <div style={{display:'flex',alignItems:'center',gap:16}}>
+            <div className="score-ring-wrap">
+              <ScoreRing score={r.original_score||r.score} color={scoreColor(r.original_score||r.score)}/>
+              <div>
+                <div style={{fontFamily:"'Space Mono',monospace",fontSize:10,color:"var(--text-muted)",letterSpacing:1,textTransform:"uppercase"}}>Original</div>
+                <div style={{fontFamily:"'Space Mono',monospace",fontSize:11,color:"var(--text-dim)",marginTop:1}}>{(r.original_score||r.score)>=80?"Strong":((r.original_score||r.score)>=50?"Medium":"Weak")}</div>
+              </div>
+            </div>
+            <div style={{display:'flex',flexDirection:'column',alignItems:'center',gap:2}}>
+              {r.optimized_score && r.score_improvement > 0 && (
+                <span style={{fontFamily:"'Space Mono',monospace",fontSize:10,color:'var(--green)',fontWeight:700}}>+{r.score_improvement}</span>
+              )}
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={r.score_improvement>0?'var(--green)':'var(--border)'} strokeWidth="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </div>
+            <div className="score-ring-wrap">
+              <ScoreRing score={r.optimized_score||r.score} color={scoreColor(r.optimized_score||r.score)}/>
+              <div>
+                <div style={{fontFamily:"'Space Mono',monospace",fontSize:10,color:'var(--green)',letterSpacing:1,textTransform:"uppercase"}}>Optimized</div>
+                <div style={{fontFamily:"'Space Mono',monospace",fontSize:11,color:"var(--text-dim)",marginTop:1}}>{(r.optimized_score||r.score)>=80?"Strong match":((r.optimized_score||r.score)>=50?"Needs work":"Significant gaps")}</div>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <div className="split-layout">
+        <div className="split-layout" ref={splitRef}>
           
           <div className="analysis-col">
 
@@ -817,46 +970,17 @@ export default function ResumeOptimizer(){
 
             {(plan.final_action_items||[]).length>0&&(<div className="card" style={{marginTop:8}}><h3 className="accent"><SparkleIcon size={14}/> Action Items</h3>{plan.final_action_items.map((item,i)=>(<div className="action-item" key={i}><div className={`action-num ${item.impact||'medium'}`}>{item.priority||i+1}</div><div><div className="action-text">{item.action}</div><div className="action-impact" style={{color:item.impact==='high'?'var(--red)':item.impact==='medium'?'var(--yellow)':'var(--green)'}}>{item.impact} impact</div></div></div>))}</div>)}
 
-            {r.cover_letter&&(<div className="cover-letter-section">
-              <h3>
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-                Cover Letter
-              </h3>
-              <div className="cl-meta">
-                {r.cover_letter.job_title&&<span>Role: {r.cover_letter.job_title}</span>}
-                {r.cover_letter.word_count&&<span>Words: {r.cover_letter.word_count}</span>}
-                {r.cover_letter.keywords_included&&<span>Keywords: {r.cover_letter.keywords_included.length} included</span>}
-              </div>
-              <div className="cl-body">
-                <div style={{marginBottom:14,fontWeight:500}}>{r.cover_letter.greeting}</div>
-                {Array.isArray(r.cover_letter.cover_letter_paragraphs)&&r.cover_letter.cover_letter_paragraphs.length>0
-                  ?r.cover_letter.cover_letter_paragraphs.map((para,i)=><p key={i} style={{margin:'0 0 14px 0',lineHeight:1.75,textAlign:'justify'}}>{para}</p>)
-                  :(r.cover_letter.cover_letter||'').split('\n\n').filter(Boolean).map((para,i)=><p key={i} style={{margin:'0 0 14px 0',lineHeight:1.75,textAlign:'justify'}}>{para}</p>)
-                }
-                <div style={{marginTop:16,marginBottom:4}}>Warm regards,</div>
-                <div style={{fontWeight:700}}>{r.cover_letter.candidate_name}</div>
-              </div>
-              {(r.cover_letter.keywords_included||[]).length>0&&(
-                <div>
-                  <div style={{fontSize:10,fontFamily:"'Space Mono',monospace",color:"var(--yellow)",letterSpacing:1,textTransform:"uppercase",marginBottom:8}}>Keywords included</div>
-                  <div className="cl-keywords">{r.cover_letter.keywords_included.map((k,i)=><span key={i} className="tag yellow">{k}</span>)}</div>
-                </div>
-              )}
-              {r.cover_letter_html&&(
-                <div style={{marginTop:16,display:'flex',gap:10,flexWrap:'wrap'}}>
-                  <button className="dl-btn cover" style={{fontSize:13,padding:'10px 20px'}} onClick={()=>downloadHtml(r.cover_letter_html,r.cover_letter_filename||'Cover_Letter.html')}><DownloadIcon/> Download Cover Letter</button>
-                  <button className="dl-btn tertiary" style={{fontSize:13,padding:'10px 20px'}} onClick={()=>saveAsPdf(r.cover_letter_html)}><PdfIcon/> Save as PDF</button>
-                </div>
-              )}
-            </div>)}
+            
 
           </div>
 
-          
+          <DragHandle onDrag={handleResize}/>
+
           {hasResume&&(
-            <div className="resume-col">
+            <div className="resume-col" style={{width:resumeWidth,flexShrink:0,flexGrow:0,flexBasis:resumeWidth}}>
               <ResumePreview
                 html={r.optimized_resume_html}
+                originalHtml={r.original_resume_html||null}
                 matchedKeywords={r.matched_keywords||[]}
                 missingKeywords={r.missing_keywords||[]}
                 downloadAsDocx={downloadAsDocx}
@@ -867,9 +991,44 @@ export default function ResumeOptimizer(){
           )}
 
         </div>
+
+        {r.cover_letter&&(
+          <div className="cover-letter-section" style={{marginTop:24}}>
+            <h3>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+              Cover Letter
+            </h3>
+            <div className="cl-meta">
+              {r.cover_letter.job_title&&<span>Role: {r.cover_letter.job_title}</span>}
+              {r.cover_letter.word_count&&<span>Words: {r.cover_letter.word_count}</span>}
+              {r.cover_letter.keywords_included&&<span>Keywords: {r.cover_letter.keywords_included.length} included</span>}
+            </div>
+            <div className="cl-body">
+              <div style={{marginBottom:14,fontWeight:500}}>{r.cover_letter.greeting}</div>
+              {Array.isArray(r.cover_letter.cover_letter_paragraphs)&&r.cover_letter.cover_letter_paragraphs.length>0
+                ?r.cover_letter.cover_letter_paragraphs.map((para,i)=><p key={i} style={{margin:'0 0 14px 0',lineHeight:1.75,textAlign:'justify'}}>{para}</p>)
+                :(r.cover_letter.cover_letter||'').split('\n\n').filter(Boolean).map((para,i)=><p key={i} style={{margin:'0 0 14px 0',lineHeight:1.75,textAlign:'justify'}}>{para}</p>)
+              }
+              <div style={{marginTop:16,marginBottom:4}}>Warm regards,</div>
+              <div style={{fontWeight:700}}>{r.cover_letter.candidate_name}</div>
+            </div>
+            {(r.cover_letter.keywords_included||[]).length>0&&(
+              <div>
+                <div style={{fontSize:10,fontFamily:"'Space Mono',monospace",color:"var(--yellow)",letterSpacing:1,textTransform:"uppercase",marginBottom:8}}>Keywords included</div>
+                <div className="cl-keywords">{r.cover_letter.keywords_included.map((k,i)=><span key={i} className="tag yellow">{k}</span>)}</div>
+              </div>
+            )}
+            {r.cover_letter_html&&(
+              <div style={{marginTop:16,display:'flex',gap:10,flexWrap:'wrap'}}>
+                <button className="dl-btn cover" style={{fontSize:13,padding:'10px 20px'}} onClick={()=>downloadHtml(r.cover_letter_html,r.cover_letter_filename||'Cover_Letter.html')}><DownloadIcon/> Download Cover Letter</button>
+                <button className="dl-btn tertiary" style={{fontSize:13,padding:'10px 20px'}} onClick={()=>saveAsPdf(r.cover_letter_html)}><PdfIcon/> Save as PDF</button>
+              </div>
+            )}
+          </div>
+        )}
+
       </div>)}
     </div>
   );
 }
 
-export default ResumeOptimizer;
