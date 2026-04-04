@@ -827,7 +827,7 @@ export default function ResumeOptimizer(){
     <div className="app"><style>{styles}</style>
       <div className="header">
         <div className="header-badge"><SparkleIcon size={12}/> ATS Resume Optimizer</div>
-        <h1>Beat the ATS.<br/>Land the Interview.</h1>
+        <h1>The AI-Powered<br/>Resume Optimizer</h1>
         <p>Drop your resume, paste the job description, and get a 6-stage AI analysis with a fully rewritten, downloadable resume.</p>
       </div>
 
@@ -845,7 +845,7 @@ export default function ResumeOptimizer(){
         </div>
       </div>
 
-      <div className="webhook-config" style={{maxWidth:1120,marginLeft:'auto',marginRight:'auto'}}><div className="section-label"><span className="num">3</span> n8n Webhook URL</div><div className="webhook-input-row"><input type="url" placeholder="http://localhost:5678/webhook-test/resume-optimizer" value={webhookUrl==="YOUR_N8N_WEBHOOK_URL_HERE"?"":webhookUrl} onChange={e=>setWebhookUrl(e.target.value)}/></div></div>
+      <div className="webhook-config" style={{maxWidth:1120,marginLeft:'auto',marginRight:'auto'}}><div className="section-label"><span className="num">3</span> n8n Webhook URL</div><div className="webhook-input-row"><input type="url" placeholder="Add your test webhook link" value={webhookUrl==="YOUR_N8N_WEBHOOK_URL_HERE"?"":webhookUrl} onChange={e=>setWebhookUrl(e.target.value)}/></div></div>
 
       <div style={{maxWidth:1120,marginLeft:'auto',marginRight:'auto',display:'flex',gap:12,flexDirection:'column'}}>
         <button className={`analyze-btn ${loading?"loading":isReady?"ready":"disabled"}`} onClick={analyze} disabled={!isReady||loading}>
@@ -855,8 +855,11 @@ export default function ResumeOptimizer(){
           onMouseOver={e=>{e.currentTarget.style.borderColor='var(--accent)';e.currentTarget.style.color='var(--accent)'}}
           onMouseOut={e=>{e.currentTarget.style.borderColor='var(--border)';e.currentTarget.style.color='var(--text-dim)'}}>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-          Load demo — preview the full results UI instantly
+          Load Demo
         </button>
+        <p style={{textAlign:'center',fontSize:12,color:'var(--text-muted)',fontFamily:"'Space Mono',monospace",lineHeight:1.6,marginTop:2}}>
+          Press this to preview exactly what the output will look like when the workflow runs and executes — no file or webhook needed.
+        </p>
       </div>
 
       {loading&&(<div className="pipeline">{pipelineLabels.map((s,i)=>(<div key={s} style={{display:"flex",alignItems:"center"}}><div className={`pipeline-step ${pipelineStep===i+1?"active":pipelineStep>i+1?"done":""}`}>{pipelineStep>i+1?<CheckIcon/>:(i+1)} {s}</div>{i<pipelineLabels.length-1&&<span className="pipeline-arrow">›</span>}</div>))}</div>)}
